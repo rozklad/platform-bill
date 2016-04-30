@@ -26,10 +26,6 @@
 				
 				@foreach ($bills as $bill)
 
-						<?php dd($bill);?>
-
-				<!--{{ $bill }}-->
-
 				<tr>
 
 					<td>
