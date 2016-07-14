@@ -67,7 +67,7 @@ return [
 	|
 	*/
 
-	'version' => '0.2.4',
+	'version' => '0.2.5',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -173,7 +173,7 @@ return [
 		{
 			Route::get('/', ['as' => 'sanatorium.bill.bills.index', 'uses' => 'BillsController@index']);
 			Route::post('create', ['as' => 'sanatorium.bill.bills.create', 'uses' => 'BillsController@create']);
-			Route::get('new', ['as' => 'sanatorium.bill.bills.new', 'uses' => 'BillsController@newBill']);
+			Route::get('create', ['as' => 'sanatorium.bill.bills.create', 'uses' => 'BillsController@newBill']);
 			Route::get('{id}'   , ['as' => 'sanatorium.bill.bills.edit'  , 'uses' => 'BillsController@edit']);
 			Route::post('{id}'  , ['as' => 'sanatorium.bill.bills.edit'  , 'uses' => 'BillsController@update']);
 		});

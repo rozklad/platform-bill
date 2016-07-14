@@ -21,7 +21,7 @@ class BillsController extends Controller {
 
 		$this->bills = $bills;
 
-        $this->jobs = $jobs;
+		$this->jobs = $jobs;
 	}
 
 	/**
@@ -34,11 +34,11 @@ class BillsController extends Controller {
 
 		if ( Sentinel::check() ) {
 
-			$bills  = app('sanatorium.bill.bill');
+			$bills  = app('sanatorium.bill.bill')->get();
 
-			$user = Sentinel::getUser();
+			/*$user = Sentinel::getUser();
 
-			$bills = $bills->where('supplier_id', $user->id)->get();
+			$bills = $bills->where('supplier_id', $user->id)->get();*/
 
 			return view('sanatorium/bill::index', compact('bills'));
 
@@ -51,6 +51,8 @@ class BillsController extends Controller {
 
 	public function create($id = null)
 	{
+
+		/*
 
 		// Store the bill
 		list($messages) = $this->bills->store($id, request()->all());
@@ -68,48 +70,62 @@ class BillsController extends Controller {
 
 		$bill = $bills->where('num', request()->num);*/
 
-		return redirect()->back()->withInput();
+		//return redirect()->back()->withInput();
+
+		return $this->processForm('create', $id);
 	}
 
 	public function newBill()
 	{
 		$bills = app('sanatorium.bill.bill');
 
-		$year = date("Y");
-
-		$num = count($bills->where('year', $year)->get()) + 1;		
-
-		$bill = [
-		"num" => $num,
-		"issue_date" => date("Y-m-j"),
-		"due_date" => date('Y-m-d', strtotime('+14 days')),
-		"means_of_payment" => "",
-		"payment_symbol" => "",
-		"account_number" => "",
-		"iban" => "",
-		"swift" => "",
-		"buyer_id" => "1",
-		"supplier_id" => "1",
-		"year" => $year,
-		];
-
-		list($messages) = $this->bills->store(null, $bill);
-
-		$actual_bill = $this->bills->get()->last();
-
-		/*$users = app('platform.users')->get();
-
 		$clients = app('sanatorium.clients.client')->get();
+
+		$suppliers = $clients->where('supplier', 'supplier');
+
+		$buyers = $clients->where('supplier', 'buyer');
 
 		$year = date("Y");
 
 		$num = count($bills->where('year', $year)->get()) + 1;
 
-		return view('sanatorium/bill::new', compact('num', 'users', 'clients'));*/
+		$issue_date = date("Y-m-j");
 
-		return redirect()->route('sanatorium.bill.bills.edit', $actual_bill->id);
+		$due_date = date('Y-m-d', strtotime('+14 days'));
 
-	}
+        /*$bill = [
+        "num" => $num,
+        "issue_date" => date("Y-m-j"),
+        "due_date" => date('Y-m-d', strtotime('+14 days')),
+        "means_of_payment" => "",
+        "payment_symbol" => "",
+        "account_number" => "",
+        "iban" => "",
+        "swift" => "",
+        "buyer_id" => "1",
+        "supplier_id" => "1",
+        "year" => $year,
+        ];
+
+        list($messages) = $this->bills->store(null, $bill);
+
+        $actual_bill = $this->bills->get()->last();
+
+        /*$users = app('platform.users')->get();
+
+        $clients = app('sanatorium.clients.client')->get();
+
+        $year = date("Y");
+
+        $num = count($bills->where('year', $year)->get()) + 1;
+
+        return view('sanatorium/bill::new', compact('num', 'users', 'clients'));
+
+        return redirect()->route('sanatorium.bill.bills.edit', $actual_bill->id);*/
+
+        return view('sanatorium/bill::new', compact('num', 'issue_date', 'due_date', 'suppliers', 'buyers'));
+
+    }
 
 	/**
 	 * Processes the form.
@@ -122,45 +138,43 @@ class BillsController extends Controller {
 	{
 
 		// Store the bill
-		list($messages_bill) = $this->bills->store($id, request()->bill[0]);
+		list($messages_bill, $bill) = $this->bills->store($id, request()->bill[0]);
 
         // Store the job
 
-        foreach ( request()->jobs as $job ) {
+		foreach ( request()->jobs as $job ) {
 
-            list($messages_job) = $this->jobs->store(null, $job);
+			list($messages_job) = $this->jobs->store(null, $job);
 
-        }
+		}
 
 		// Do we have any errors?
 		if ( $messages_bill->isEmpty() || $messages_job->isEmpty() )
 		{
 			$this->alerts->success(trans("sanatorium/bill::bills/message.success.{$mode}"));
 
-            $bill = app('sanatorium.bill.bill')->where('id', $id)->first();
+			$jobs = app('sanatorium.bill.job')->where('bill_id', $id)->get();
 
-            $jobs = app('sanatorium.bill.job')->where('bill_id', $id)->get();
+			$buyer = app('sanatorium.clients.client')->where('id', $bill->buyer_id)->first();
 
-            $buyer = app('sanatorium.clients.client')->where('id', $bill->buyer_id)->first();
+			$supplier = app('sanatorium.clients.client')->where('id', $bill->supplier_id)->first();
 
-            $supplier = app('sanatorium.clients.client')->where('id', $bill->supplier_id)->first();
+			$pdf = PDF::loadView('sanatorium/bill::pdf/template', compact('bill', 'jobs', 'buyer', 'supplier'));
 
-            $pdf = PDF::loadView('sanatorium/bill::pdf/template', compact('bill', 'jobs', 'buyer', 'supplier'));
+			//$pdf = PDF::loadHtml('<h1>Ahoj</h1>');
 
-            return $pdf->stream('plan.pdf');
+			return $pdf->stream('plan.pdf');
 
 			return redirect()->route('sanatorium.bill.bills.index');
 		}
 
 		$this->alerts->error($messages, 'form');
 
-        $bill = app('sanatorium.bill.bill')->where('id', $id)->first();
+		$bill = app('sanatorium.bill.bill')->where('id', $id)->first();
 
-        $jobs = app('sanatorium.bill.job')->where('bill_id', $id)->get();
+		$jobs = app('sanatorium.bill.job')->where('bill_id', $id)->get();
 
-        $buyer = app('sanatorium.bill.client')->where('id', $bill->buyer_id)->first();
-
-        dd($jobs);
+		$buyer = app('sanatorium.bill.client')->where('id', $bill->buyer_id)->first();
 
 		return redirect()->back()->withInput();
 	}
@@ -216,7 +230,7 @@ class BillsController extends Controller {
 		$clients = app('sanatorium.clients.client')->get();
 
 		// Show the page
-		return view('sanatorium/bill::new', compact('mode', 'bill', 'users', 'clients'));
+		return view('sanatorium/bill::create', compact('mode', 'bill', 'users', 'clients'));
 	}
 
 }

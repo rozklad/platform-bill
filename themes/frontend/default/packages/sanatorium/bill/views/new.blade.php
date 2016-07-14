@@ -1,126 +1,235 @@
-@extends('layouts/default')
+@extends('sanatorium/bill::layout/default')
+
+@section('bill')
 
 @section('scripts')
 
-    <script>
+<script>
 
-        $(function(){
+    $(function () {
 
-            var job_number = 1;
+        var job_number = 1;
 
-            $('#more_jobs').click(function(){
+        $('#more_jobs').click(function () {
 
-                $(".input-group[data-job-number='" + (job_number - 1) + "']").after('<div class="input-group" data-job-number="' + job_number + '"><input type="text" id="bill_id" name="jobs[' + job_number + '][bill_id]" hidden value="{{ $bill->id  }}"><label for="quantity">Quantity</label> <input type="number" id="jobs.quantity" name="jobs[' + job_number + '][quantity]"> <label for="description">Description</label><input type="text" id="description" name="jobs[' + job_number + '][description]"><label for="price">Price</label><input type="number" id="price" name="jobs[' + job_number + '][price]"><label for="currency">Currency</label><input type="text" id="currency" name="jobs[' + job_number + '][currency]"></div>');
+            $(".row[data-job-number='" + (job_number - 1) + "']").after('<div class="row" data-job-number="' + job_number + '"><div class="form-group"><input type="text" id="bill_id" name="jobs[' + job_number + '][bill_id]" hidden value=""><div class="col-sm-1"><input required class="form-control" type="number" id="jobs.quantity" name="jobs[' + job_number + '][quantity]" value="1"></div><div class="col-sm-6"><input required class="form-control" type="text" id="description" name="jobs[' + job_number + '][description]" placeholder="Description"></div><div class="col-sm-2"><input required class="form-control" type="number" id="price" name="jobs[' + job_number + '][price]" placeholder="Price"></div><div class="col-sm-2"><input required class="form-control" type="text" id="currency" name="jobs[' + job_number + '][currency]" placeholder="Currency"></div></div></div>');
 
-                job_number++;
-
-            });
+            job_number++;
 
         });
 
-    </script>
+    });
+
+</script>
 
 @stop
 
-@section('page')
+<div class="container">
 
-    <div class="container">
+    <form method="post">
 
-        <form method="post">
+        <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
-            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+        <input type="text" id="num" name="bill[0][num]" value="{{ $num }}" hidden>
 
-            <input type="text" id="num" name="bill[0][num]" value="{{ $bill->num }}" hidden>
+        <div class="row">
 
-            <label for="issue_date">Issue date</label>
+            <!-- Left side -->
 
-            <input type="date" id="issue_date" name="bill[0][issue_date]" value="{{ $bill->issue_date }}">
+            <div class="col-sm-6">
 
-            <label for="due_date">Due date</label>
+                <!-- Issue date -->
 
-            <input type="date" id="due_date" name="bill[0][due_date]" value="{{ $bill->due_date }}">
+                <div class="form-group">
 
-            <label for="means_of_payment">Means of payment</label>
+                    <label for="issue_date">Issue date</label>
 
-            <input type="text" id="means_of_payment" name="bill[0][means_of_payment]"
-                   value="{{ $bill->means_of_payment }}">
+                    <input class="form-control" type="date" id="issue_date" name="bill[0][issue_date]"
+                    value="{{ $issue_date }}">
 
-            <label for="payment_symbol">Payment symbol</label>
+                </div>
 
-            <input type="text" id="payment_symbol" name="bill[0][payment_symbol]" value="{{ $bill->payment_symbol }}">
+                <!-- Means of payment -->
 
-            <label for="account_number">Account number</label>
+                <div class="form-group">
 
-            <input type="text" id="account_number" name="bill[0][account_number]" value="{{ $bill->account_number }}">
+                    <!--<label for="means_of_payment">Means of payment</label>-->
 
-            <label for="iban">IBAN</label>
+                    <select class="form-control" name="bill[0][means_of_payment]" id="means_of_payment">
 
-            <input type="text" id="iban" name="bill[0][iban]" value="{{ $bill->iban }}">
+                        <option value="bank_transfer">Bank transfer</option>
 
-            <label for="swift">SWIFT</label>
+                        <option value="cash">Cash</option>
 
-            <input type="text" id="swift" name="bill[0][swift]" value="{{ $bill->swift }}">
+                    </select>
 
-            <label for="buyer_id">Buyer</label>
+                    <!-- <input required type="text" class="form-control" id="means_of_payment" name="bill[0][means_of_payment]">-->
 
-            <select name="bill[0][buyer_id]" id="buyer_id">
+                </div>
 
-                @foreach ( $clients as $client )
+                <!-- Supplier ID -->
 
-                    <option value="{{ $client->id }}">{{ $client->name }}</option>
+                <div class="form-group">
 
-                @endforeach
+                    <!--<label for="supplier_id">Supplier</label>-->
 
-            </select>
+                    <select class="form-control" name="bill[0][supplier_id]" id="supplier_id">
 
-            <label for="supplier_id">Supplier</label>
+                        @foreach ( $suppliers as $supplier )
 
-            <select name="bill[0][supplier_id]" id="supplier_id">
+                        <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
 
-                @foreach ( $clients as $client )
+                        @endforeach
 
-                    @if ( $client->supplier )
+                    </select>
 
-                    <option value="{{ $client->id }}">{{ $client->name }}</option>
+                </div>
 
-                    @endif
+                <!-- IBAN -->
 
-                @endforeach
+                <div class="form-group">
 
-            </select>
+                    <!--<label for="iban">IBAN</label>-->
 
-            <input type="text" id="year" name="bill[0][year]" value="<?= date('Y') ?>" hidden>
+                    <input type="text" class="form-control" id="iban" name="bill[0][iban]" placeholder="IBAN">
 
-            <h5>Jobs</h5>
+                </div>
 
-            <div class="input-group" data-job-number="0">
+                <!-- Buyer ID -->
 
-                <input type="text" id="bill_id" name="jobs[0][bill_id]" hidden value="{{ $bill->id  }}">
+                <div class="form-group">
 
-                <label for="quantity">Quantity</label>
+                    <!--<label for="buyer_id">Buyer</label>-->
 
-                <input type="number" id="jobs.quantity" name="jobs[0][quantity]">
+                    <select class="form-control" name="bill[0][buyer_id]" id="buyer_id">
 
-                <label for="description">Description</label>
+                        @foreach ( $buyers as $buyer )
 
-                <input type="text" id="description" name="jobs[0][description]">
+                        <option value="{{ $buyer->id }}">{{ $buyer->name }}</option>
 
-                <label for="price">Price</label>
+                        @endforeach
 
-                <input type="number" id="price" name="jobs[0][price]">
+                    </select>
 
-                <label for="currency">Currency</label>
-
-                <input type="text" id="currency" name="jobs[0][currency]">
+                </div>
 
             </div>
 
-            <span class="btn btn-primary" id="more_jobs">More jobs</span>
+            <!-- Right side -->
 
-            <button type="submit">Posli</button>
+            <div class="col-sm-6">
 
-        </form>
+                <!-- Due date -->
 
-    </div>
+                <div class="form-group">
+
+                    <label for="due_date">Due date</label>
+
+                    <input class="form-control" type="date" id="due_date" name="bill[0][due_date]"
+                    value="{{ $due_date }}">
+
+                </div>
+
+                <!-- Payment symbol -->
+
+                <div class="form-group">
+
+                    <!--<label for="payment_symbol">Payment symbol</label>-->
+
+                    <input required type="text" class="form-control" id="payment_symbol" name="bill[0][payment_symbol]" placeholder="Payment symbol">
+
+                </div>
+
+                <!-- Account number -->
+
+                <div class="form-group">
+
+                    <!--<label for="account_number">Account number</label>-->
+
+                    <input required type="text" class="form-control" id="account_number" name="bill[0][account_number]" placeholder="Account number">
+
+                </div>
+
+                <!-- SWIFT -->
+
+                <div class="form-group">
+
+                    <!--<label for="swift">SWIFT</label>-->
+
+                    <input type="text" class="form-control" id="swift" name="bill[0][swift]" placeholder="SWIFT">
+
+                </div>
+
+                <input type="text" id="year" name="bill[0][year]" value="<?= date('Y') ?>" hidden>
+
+            </div>
+
+            <!-- Jobs -->
+
+            <div class="col-sm-12 jobs-col">
+
+                <!-- Single Job -->
+
+                <div class="row" data-job-number="0">
+
+                    <div class="form-group ">
+
+                        <input type="text" id="bill_id" name="jobs[0][bill_id]" hidden value="">
+
+                        <!--<label for="quantity">Quantity</label>-->
+
+                        <div class="col-sm-1">
+
+                            <input required class="form-control" type="number" id="jobs.quantity" name="jobs[0][quantity]" value="1">
+
+                        </div>
+
+                        <!--<label for="description">Job description</label>-->
+
+                        <div class="col-sm-6">
+
+                            <input required class="form-control" type="text" id="description" name="jobs[0][description]" placeholder="Description">
+
+                        </div>
+
+                        <!--<label for="price">Price</label>-->
+
+                        <div class="col-sm-2">
+
+                            <input required class="form-control" type="number" id="price" name="jobs[0][price]" placeholder="Price">
+
+                        </div>
+
+                        <!--<label for="currency">Currency</label>-->
+
+                        <div class="col-sm-2">
+
+                            <input required class="form-control" type="text" id="currency" name="jobs[0][currency]" placeholder="Currency">
+
+                        </div>
+
+                        <div class="col-sm-1 buttons-col">
+
+                            <span class="circle-button" id="more_jobs">x</span>
+
+                            <span class="circle-button" id="more_jobs">+</span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <span class="btn btn-block btn-dollar-green" id="more_jobs">More jobs</span>
+
+                <button class="btn btn-block btn-dollar-green" type="submit">Save & Generate PDF</button>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
 
 @stop
