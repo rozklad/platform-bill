@@ -18,7 +18,6 @@ class Job extends Model implements EntityInterface {
 	 * {@inheritDoc}
 	 */
 	protected $guarded = [
-		'id',
 	];
 
 	/**

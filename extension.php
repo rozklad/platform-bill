@@ -67,7 +67,7 @@ return [
 	|
 	*/
 
-	'version' => '0.2.5',
+	'version' => '0.2.6',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -226,6 +226,8 @@ return [
 	*/
 
 	'seeds' => [
+
+		'Sanatorium\Bill\Database\Seeds\OriginalbillTableSeeder',
 
 	],
 

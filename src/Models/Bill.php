@@ -18,7 +18,6 @@ class Bill extends Model implements EntityInterface {
 	 * {@inheritDoc}
 	 */
 	protected $guarded = [
-		'id',
 	];
 
 	/**
