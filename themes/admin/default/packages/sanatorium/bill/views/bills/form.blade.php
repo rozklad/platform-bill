@@ -8,10 +8,82 @@
 
 {{-- Queue assets --}}
 {{ Asset::queue('validate', 'platform/js/validate.js', 'jquery') }}
+{{ Asset::queue('underscore', 'underscore/js/underscore.js') }}
+{{ Asset::queue('moment', 'moment/js/moment.js') }}
+{{ Asset::queue('selectize', 'selectize/js/selectize.js', 'jquery') }}
+{{ Asset::queue('selectize', 'selectize/css/selectize.bootstrap3.css') }}
 
 {{-- Inline scripts --}}
 @section('scripts')
 @parent
+<script type="text/javascript">
+	$(function(){
+
+		var jobs = {!! json_encode($bill->jobs()->get()) !!};
+
+		function loadJobsTemplate() {
+
+			var html = _.template( $('#jobs').html() )({
+				jobs: jobs
+			});
+			$('#jobs-container').html(html);
+
+			$('[data-jobs-delete]').click(function(event){
+				event.preventDefault();
+
+				var index = $(this).parents('[data-jobs-index]:first').data('jobs-index');
+
+				if ( typeof index == 'undefined' )
+					return false;
+
+				jobs.splice(index, 1);
+
+				loadJobsTemplate();
+			});
+
+			$('[data-jobs-input]').change(function(event){
+
+				var input = $(this).data('jobs-input'),
+					index = $(this).parents('[data-jobs-index]:first').data('jobs-index');
+
+				jobs[index][input] = $(this).val();
+
+			});
+
+		}
+
+		loadJobsTemplate();
+
+		$('[data-jobs-add]').click(function(event){
+			event.preventDefault();
+
+			// @todo: default configurable
+			jobs.push({
+				quantity: 1,
+				description: '',
+				price: 0,
+				currency: 'Kč'
+			});
+
+			loadJobsTemplate();
+		});
+
+		$('select').selectize();
+
+		$('[name="num"]').change(function(event){
+
+			$('[name="payment_symbol"]').val( $(this).val() );
+
+		});
+
+		$('[name="due_date"]').change(function(event){
+
+			$('[name="year"]').val( moment( $(this).val() ).format('Y') );
+
+		});
+
+	});
+</script>
 @stop
 
 {{-- Inline styles --}}
@@ -114,6 +186,12 @@
 											@endforeach
 										</select>
 
+										<span class="help-block">
+											<a href="#" data-toggle="modal" data-target="#createClient">
+												{{{ trans("action.create") }}} {{ trans('sanatorium/clients::clients/common.title') }}
+											</a>
+										</span>
+
 										<span class="help-block">{{{ Alert::onForm('buyer_id') }}}</span>
 
 									</div>
@@ -133,6 +211,12 @@
 												<option value="{{ $supplier->id }}" {{ $supplier->id == $bill->supplier_id ? 'selected' : '' }}>{{ $supplier->name }}</option>
 											@endforeach
 										</select>
+
+										<span class="help-block">
+											<a href="#" data-toggle="modal" data-target="#createClient">
+												{{{ trans("action.create") }}} {{ trans('sanatorium/clients::clients/common.title') }}
+											</a>
+										</span>
 
 										<span class="help-block">{{{ Alert::onForm('supplier_id') }}}</span>
 
@@ -225,7 +309,7 @@
 											{{{ trans('sanatorium/bill::bills/model.general.account_number') }}}
 										</label>
 
-										<input type="text" class="form-control" name="account_number" id="account_number" placeholder="{{{ trans('sanatorium/bill::bills/model.general.account_number') }}}" value="{{{ input()->old('account_number', $bill->account_number) }}}">
+										<input type="text" class="form-control" name="account_number" id="account_number" placeholder="{{{ trans('sanatorium/bill::bills/model.general.account_number') }}}" value="{{{ input()->old('account_number', $bill->account_number ? $bill->account_number : $suggested_account_number) }}}">
 
 										<span class="help-block">{{{ Alert::onForm('account_number') }}}</span>
 
@@ -238,7 +322,7 @@
 											{{{ trans('sanatorium/bill::bills/model.general.iban') }}}
 										</label>
 
-										<input type="text" class="form-control" name="iban" id="iban" placeholder="{{{ trans('sanatorium/bill::bills/model.general.iban') }}}" value="{{{ input()->old('iban', $bill->iban) }}}">
+										<input type="text" class="form-control" name="iban" id="iban" placeholder="{{{ trans('sanatorium/bill::bills/model.general.iban') }}}" value="{{{ input()->old('iban', $bill->iban ? $bill->iban : $suggested_iban) }}}">
 
 										<span class="help-block">{{{ Alert::onForm('iban') }}}</span>
 
@@ -251,7 +335,7 @@
 											{{{ trans('sanatorium/bill::bills/model.general.swift') }}}
 										</label>
 
-										<input type="text" class="form-control" name="swift" id="swift" placeholder="{{{ trans('sanatorium/bill::bills/model.general.swift') }}}" value="{{{ input()->old('swift', $bill->swift) }}}">
+										<input type="text" class="form-control" name="swift" id="swift" placeholder="{{{ trans('sanatorium/bill::bills/model.general.swift') }}}" value="{{{ input()->old('swift', $bill->swift ? $bill->swift : $suggested_swift) }}}">
 
 										<span class="help-block">{{{ Alert::onForm('swift') }}}</span>
 
@@ -278,35 +362,19 @@
 
 						<fieldset>
 
-							<legend>Jobs</legend>
+							<legend>{{ trans('sanatorium/bill::jobs/common.title') }}</legend>
 
-							@foreach( $bill->jobs()->get() as $index => $job )
+							<div id="jobs-container">
 
-								<div class="row">
-									<div class="col-sm-1">
-										<input type="text" class="form-control" name="jobs[{{ $index }}][quantity]" value="{{ $job->quantity }}">
-									</div>
-									<div class="col-sm-6">
-										<input type="text" class="form-control" name="jobs[{{ $index }}][description]" value="{{ $job->description }}">
-									</div>
-									<div class="col-sm-2">
-										<input type="text" class="form-control" name="jobs[{{ $index }}][price]" value="{{ $job->price }}">
-									</div>
-									<div class="col-sm-1">
-										<select name="jobs[{{ $index }}][currency]" class="form-control">
-											@foreach( $supported_currencies as $currency_code => $currency_name )
-												<option value="{{ $currency_code }}" {{ $currency_code == $job->currency ? 'selected' : '' }}>{{ $currency_name }}</option>
-											@endforeach
-										</select>
-									</div>
-									<div class="col-sm-2 text-right">
-										<button type="button" class="btn btn-default">
-											<i class="fa fa-minus"></i>
-										</button>
-									</div>
+							</div>
+
+							<div class="row">
+								<div class="col-sm-12 text-center">
+									<button type="button" class="btn btn-success" data-jobs-add>
+										<i class="fa fa-plus"></i>
+									</button>
 								</div>
-
-							@endforeach
+							</div>
 
 						</fieldset>
 
@@ -326,4 +394,103 @@
 	</form>
 
 </section>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="createClient">
+	<form method="POST" action="{{ route('admin.sanatorium.clients.clients.create') }}">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">
+						{{{ trans("action.create") }}} {{ trans('sanatorium/clients::clients/common.title') }}
+					</h4>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-sm-12">
+							<div class="form-group">
+								<select class="form-control" name="supplier">
+									<option value="0">Buyer</option>
+									<option value="1">Supplier</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-12">
+							<div class="form-group">
+								<input type="text" class="form-control" name="name" placeholder="{{ trans('sanatorium/clients::clients/model.general.name') }}">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-12">
+							<div class="form-group">
+								<input type="text" class="form-control" name="tax_id" placeholder="{{ trans('sanatorium/clients::clients/model.general.tax_id') }}">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-12">
+							<div class="form-group">
+								<input type="text" class="form-control" name="vat_id" placeholder="{{ trans('sanatorium/clients::clients/model.general.vat_id') }}">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-12">
+							<div class="form-group">
+								<textarea class="form-control" name="client_address" placeholder="{{ trans('sanatorium/clients::clients/model.general.client_address') }}"></textarea>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">
+						{{ trans('action.cancel') }}
+					</button>
+					<button type="submit" class="btn btn-primary">
+						{{ trans('action.save') }}
+					</button>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+
+<script type="text/template" id="jobs">
+
+	<% _.each(jobs, function(r, index) { %>
+
+		<div class="row" data-jobs-index="<%= index %>">
+			<% if ( typeof r.id != 'undefined' ) { %>
+				<input type="hidden" name="jobs[<%= index %>][id]" value="<%= r.id %> data-jobs-input="id">
+			<% } %>
+			<div class="col-sm-1">
+				<input type="text" class="form-control" name="jobs[<%= index %>][quantity]" value="<%= r.quantity %>" data-jobs-input="quantity">
+			</div>
+			<div class="col-sm-5">
+				<input type="text" class="form-control" name="jobs[<%= index %>][description]" value="<%= r.description %>" data-jobs-input="description">
+			</div>
+			<div class="col-sm-2">
+				<input type="text" class="form-control" name="jobs[<%= index %>][price]" value="<%= r.price %>" data-jobs-input="price">
+			</div>
+			<div class="col-sm-2">
+				<select name="jobs[<%= index %>][currency]" class="form-control" data-jobs-input="currency">
+					@foreach( $supported_currencies as $currency_code => $currency_name )
+						<option value="{{ $currency_code }}" <%= '{{ $currency_code }}' == r.currency ? 'selected' : '' %>>{{ $currency_name }}</option>
+					@endforeach
+				</select>
+			</div>
+			<div class="col-sm-2 text-right">
+				<button type="button" class="btn btn-default" data-jobs-delete>
+					<i class="fa fa-minus"></i>
+				</button>
+			</div>
+		</div>
+
+	<% }); %>
+
+</script>
+
 @stop

@@ -40,8 +40,8 @@ class Bill extends AdminController {
         {
             $money = 0;
 
-            $bills = $repo->where($date_column, '>', $start->format('Y-m-d'))
-                    ->where($date_column, '<', $start->format('Y-m-').'31')
+            $bills = $repo->where($date_column, '>=', $start->format('Y-m-d'))
+                    ->where($date_column, '<=', $start->format('Y-m-').'31')
                     ->get();
 
             // @todo: automatically resolve currencies

@@ -228,6 +228,11 @@ class BillsController extends AdminController {
             'USD' => 'USD',
         ];
 
+        // @todo: fetch from buyer
+        $suggested_iban = 'CZ91 0800 0000 0019 3699 8183';
+        $suggested_swift = 'GIBACZPX';
+        $suggested_account_number = '1936998183/0800';
+
 		// Show the page
 		return view('sanatorium/bill::bills.form', compact(
 		    'mode',
@@ -239,7 +244,10 @@ class BillsController extends AdminController {
             'possible_means_of_payment',
             'buyers',
             'suppliers',
-            'supported_currencies'
+            'supported_currencies',
+            'suggested_iban',
+            'suggested_swift',
+            'suggested_account_number'
         ));
 	}
 
@@ -253,7 +261,64 @@ class BillsController extends AdminController {
 	protected function processForm($mode, $id = null)
 	{
 		// Store the bill
-		list($messages) = $this->bills->store($id, request()->all());
+		list($messages, $bill) = $this->bills->store($id, request()->except(['jobs']));
+
+        // Sync jobs
+        if ( request()->has('jobs') )
+        {
+
+            $jobs = request()->get('jobs');
+
+            if ( is_array($jobs) )
+            {
+
+                $jobs_to_sync = [];
+
+                foreach( $jobs as $job )
+                {
+
+                    if ( isset($job['id']) )
+                    {
+                        $job = \Sanatorium\Bill\Models\Job::find($job['id']);
+
+                        $job->update([
+                            'quantity'    => $job['quantity'],
+                            'description' => $job['description'],
+                            'price'       => $job['price'],
+                            'currency'    => $job['currency'],
+                            'bill_id'     => $bill->id
+                        ]);
+
+                        $jobs_to_sync[] = $job;
+                    } else
+                    {
+                        $jobs_to_sync[] = \Sanatorium\Bill\Models\Job::create([
+                            'quantity'    => $job['quantity'],
+                            'description' => $job['description'],
+                            'price'       => $job['price'],
+                            'currency'    => $job['currency'],
+                            'bill_id'     => $bill->id
+                        ]);
+                    }
+
+                }
+
+                $current_jobs = [];
+                foreach( $jobs_to_sync as $job_to_sync )
+                {
+                    $current_jobs[] = $job_to_sync->id;
+                }
+
+                $old_jobs = $bill->jobs()->lists('id')->toArray();
+
+                $jobs_to_delete = array_diff($old_jobs, $current_jobs);
+
+                $bill->jobs()->whereIn('id', $jobs_to_delete)->delete();
+                $bill->jobs()->saveMany($jobs_to_sync);
+
+            }
+
+        }
 
 		// Do we have any errors?
 		if ($messages->isEmpty())
