@@ -28,6 +28,13 @@
 {{-- Page content --}}
 @section('page')
 
+{{-- Money over time widget --}}
+<div class="panel panel-default">
+	<div class="panel-body">
+		@widget('sanatorium/bill::bill.moneyOverTime')
+	</div>
+</div>
+
 {{-- Grid --}}
 <section class="panel panel-default panel-grid">
 

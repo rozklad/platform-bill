@@ -32,4 +32,16 @@ class Bill extends Model implements EntityInterface {
 	 */
 	protected static $entityNamespace = 'sanatorium/bill.bill';
 
+    /**
+     * The attributes that should be mutated to dates.
+     *
+     * @var array
+     */
+    protected $dates = ['created_at', 'updated_at', 'issue_date', 'due_date'];
+
+    public function jobs()
+    {
+        return $this->hasMany('Sanatorium\Bill\Models\Job');
+    }
+
 }

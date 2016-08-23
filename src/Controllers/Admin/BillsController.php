@@ -198,8 +198,49 @@ class BillsController extends AdminController {
 			$bill = $this->bills->createModel();
 		}
 
+		$currentYearLast = $this->bills->where('year', date('Y'))->orderBy('num', 'DESC')->first();
+
+        if ( is_object($currentYearLast) ) {
+            $suggested_num = $currentYearLast->num + 1;
+        } else {
+            $suggested_num = date('Y') . '001';
+        }
+
+        $default_due_days = 14; // @todo: make configurable
+
+        $suggested_issue_date = \Carbon\Carbon::now()->format('Y-m-d');
+        $suggested_due_date = \Carbon\Carbon::now()->addDays($default_due_days)->format('Y-m-d');
+
+        $suggested_year = date('Y');
+
+        // @todo: make configurable
+        $possible_means_of_payment = [
+            'Bank transfer'
+        ];
+
+        $buyers = \Sanatorium\Clients\Models\Client::where('supplier', 0)->get();
+        $suppliers = \Sanatorium\Clients\Models\Client::where('supplier', 1)->get();
+
+        $supported_currencies = [
+            'Kč' => 'Kč',
+            'EUR' => 'EUR',
+            'CHF' => 'CHF',
+            'USD' => 'USD',
+        ];
+
 		// Show the page
-		return view('sanatorium/bill::bills.form', compact('mode', 'bill'));
+		return view('sanatorium/bill::bills.form', compact(
+		    'mode',
+            'bill',
+            'suggested_num',
+            'suggested_issue_date',
+            'suggested_due_date',
+            'suggested_year',
+            'possible_means_of_payment',
+            'buyers',
+            'suppliers',
+            'supported_currencies'
+        ));
 	}
 
 	/**

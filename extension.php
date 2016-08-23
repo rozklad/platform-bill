@@ -67,7 +67,7 @@ return [
 	|
 	*/
 
-	'version' => '0.2.6',
+	'version' => '0.2.7',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -165,6 +165,14 @@ return [
 
 				Route::delete('{id}', ['as' => 'admin.sanatorium.bill.bills.delete', 'uses' => 'BillsController@delete']);
 			});
+
+        Route::group([
+                'prefix'    => admin_uri().'/bill/widgets',
+                'namespace' => 'Sanatorium\Bill\Widgets',
+            ], function()
+            {
+                Route::get('/', ['as' => 'sanatorium.bill.widgets.data', 'uses' => 'Bill@data']);
+        });
 
 		Route::group([
 			'prefix'    => 'bill/bills',
