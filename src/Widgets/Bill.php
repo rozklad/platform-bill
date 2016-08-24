@@ -53,7 +53,7 @@ class Bill extends AdminController {
 
             foreach( $bills as $bill ) {
 
-                foreach( $bill->jobs()->get() as $job ) {
+                foreach( $bill->jobs() as $job ) {
 
                     if ( isset($currencies[$job->currency]) )
                     {

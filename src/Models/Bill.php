@@ -41,7 +41,7 @@ class Bill extends Model implements EntityInterface {
 
     public function jobs()
     {
-        return $this->hasMany('Sanatorium\Bill\Models\Job');
+        return $this->hasMany('Sanatorium\Bill\Models\Job')->get();
     }
 
 }

@@ -6,6 +6,10 @@ body {
     background-color: #eee;
 }
 
+.dollar-green {
+    color: var(--dollar-green);
+}
+
 /*
 * Bill header
 *
@@ -83,11 +87,25 @@ body {
     margin-top: 5px;
 }
 
+/*
+* New bill
+*
+*/
+
 .circle-button {
     padding: 2px 6px;
     font-size: 12px;
-    border: 1px solid #bbb;
-    color: #bbb;
+    border: 1px solid;
+    color: var(--dollar-green);
     cursor: pointer;
     border-radius: 100%;
+}
+
+.circle-button.add {
+    border-color: var(--dollar-green);
+}
+
+.circle-button.delete {
+    color: #ff0800;
+    border-color: #ff0800;
 }

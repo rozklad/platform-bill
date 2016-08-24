@@ -53,7 +53,7 @@
 
 			$money = 0;
 
-			foreach( $bill->jobs()->get() as $job )
+			foreach( $bill->jobs() as $job )
 			{
 
 				if ( isset($currencies[$job->currency]) )

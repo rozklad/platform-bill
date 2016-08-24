@@ -9,7 +9,7 @@
     <style type="text/css">
         /* sizes */
         body {
-            font-family: 'Helvetica Neue', sans-serif;
+            font-family: 'DejaVu Sans', sans-serif;
         }
         table {
             width: 100%;

@@ -6,35 +6,35 @@
 
     <!-- <div class="row" data-job-number="' + job_number + '"><div class="form-group"><input type="text" id="bill_id" name="jobs[' + job_number + '][bill_id]" hidden value=""><div class="col-sm-1"><input required class="form-control" type="number" id="jobs.quantity" name="jobs[' + job_number + '][quantity]" value="1"></div><div class="col-sm-6"><input required class="form-control" type="text" id="description" name="jobs[' + job_number + '][description]" placeholder="Description"></div><div class="col-sm-2"><input required class="form-control" type="number" id="price" name="jobs[' + job_number + '][price]" placeholder="Price"></div><div class="col-sm-2"><select class="form-control" id="currency" name="jobs[' + job_number + '][currency]"><option value="Kč">Kč</option><option value="EUR">EUR</option><option value="CHF">CHF</option></select></div></div></div> -->
 
-<script>
+    <script>
 
-    $(function () {
+        $(function () {
 
-        var job_number = 1;
+            var job_number = 1;
 
-        $('#more_jobs').click(function () {
+            $('#more_jobs').click(function () {
 
-            //$(".row[data-job-number='" + (job_number - 1) + "']").after();
+                //$(".row[data-job-number='" + (job_number - 1) + "']").after();
 
-            $(".row[data-job-number]").last().after(@include('sanatorium/bill::partials/job'));
+                $(".row[data-job-number]").last().after(@include('sanatorium/bill::partials/job'));
 
-            job_number++;
+                job_number++;
+
+            });
+
+            $(document).on('click', '#delete_job', function() {
+
+                $(this).parent().parent().parent().remove();
+
+                job_number--;
+
+            });
+
+
 
         });
 
-        $(document).on('click', '#delete_job', function() {
-
-            $(this).parent().parent().parent().remove();
-
-            job_number--;
-
-        });
-
-
-
-    });
-
-</script>
+    </script>
 
 @stop
 
@@ -59,7 +59,7 @@
                     <label for="issue_date">Issue date</label>
 
                     <input class="form-control" type="date" id="issue_date" name="bill[0][issue_date]"
-                    value="{{ $issue_date }}">
+                           value="{{ $issue_date }}">
 
                 </div>
 
@@ -91,7 +91,7 @@
 
                         @foreach ( $suppliers as $supplier )
 
-                        <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
+                            <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
 
                         @endforeach
 
@@ -119,7 +119,7 @@
 
                         @foreach ( $buyers as $buyer )
 
-                        <option value="{{ $buyer->id }}">{{ $buyer->name }}</option>
+                            <option value="{{ $buyer->id }}">{{ $buyer->name }}</option>
 
                         @endforeach
 
@@ -140,7 +140,7 @@
                     <label for="due_date">Due date</label>
 
                     <input class="form-control" type="date" id="due_date" name="bill[0][due_date]"
-                    value="{{ $due_date }}">
+                           value="{{ $due_date }}">
 
                 </div>
 
