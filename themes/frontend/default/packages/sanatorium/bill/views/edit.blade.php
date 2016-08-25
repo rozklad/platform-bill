@@ -10,7 +10,7 @@
 
         $(function () {
 
-            var job_number = 1;
+            var job_number = $(".row[data-job-number]").length;
 
             $('#more_jobs').click(function () {
 
@@ -29,8 +29,6 @@
                 job_number--;
 
             });
-
-
 
         });
 
@@ -58,7 +56,7 @@
 
                     <label for="issue_date">Issue date</label>
 
-                    <input class="form-control" type="date" id="issue_date" name="bill[0][issue_date]"
+                    <input tabindex="1" class="form-control" type="date" id="issue_date" name="bill[0][issue_date]"
                            value="{{ $issue_date }}">
 
                 </div>
@@ -69,11 +67,11 @@
 
                     <!--<label for="means_of_payment">Means of payment</label>-->
 
-                    <select class="form-control" name="bill[0][means_of_payment]" id="means_of_payment">
+                    <select tabindex="3" class="form-control" name="bill[0][means_of_payment]" id="means_of_payment">
 
-                        <option value="Bank transfer">Bank transfer</option>
+                        <option <?= ($bill->mean_of_payment == 'Bank transfer') ? 'seleted' : '' ?> value="Bank transfer">Bank transfer</option>
 
-                        <option value="Cash">Cash</option>
+                        <option <?= ($bill->mean_of_payment == 'Cash') ? 'seleted' : '' ?> value="Cash">Cash</option>
 
                     </select>
 
@@ -87,7 +85,7 @@
 
                     <!--<label for="supplier_id">Supplier</label>-->
 
-                    <select class="form-control" name="bill[0][supplier_id]" id="supplier_id">
+                    <select tabindex="5" class="form-control" name="bill[0][supplier_id]" id="supplier_id">
 
                         @foreach ( $suppliers as $supplier )
 
@@ -105,7 +103,7 @@
 
                     <!--<label for="iban">IBAN</label>-->
 
-                    <input type="text" class="form-control" id="iban" name="bill[0][iban]" placeholder="IBAN">
+                    <input tabindex="7" value="{{ $bill->iban }}" type="text" class="form-control" id="iban" name="bill[0][iban]" placeholder="IBAN">
 
                 </div>
 
@@ -115,11 +113,11 @@
 
                     <!--<label for="buyer_id">Buyer</label>-->
 
-                    <select class="form-control" name="bill[0][buyer_id]" id="buyer_id">
+                    <select tabindex="9" class="form-control" name="bill[0][buyer_id]" id="buyer_id">
 
                         @foreach ( $buyers as $buyer )
 
-                            <option value="{{ $buyer->id }}">{{ $buyer->name }}</option>
+                            <option <?= ($bill->buyer_id == $buyer->id) ? 'selected' : '' ?> value="{{ $buyer->id }}">{{ $buyer->name }}</option>
 
                         @endforeach
 
@@ -139,7 +137,7 @@
 
                     <label for="due_date">Due date</label>
 
-                    <input class="form-control" type="date" id="due_date" name="bill[0][due_date]"
+                    <input tabindex="2" class="form-control" type="date" id="due_date" name="bill[0][due_date]"
                            value="{{ $due_date }}">
 
                 </div>
@@ -150,7 +148,7 @@
 
                     <!--<label for="payment_symbol">Payment symbol</label>-->
 
-                    <input required type="text" class="form-control" id="payment_symbol" name="bill[0][payment_symbol]" placeholder="Payment symbol" value="{{ $num }}">
+                    <input tabindex="4" required type="text" class="form-control" id="payment_symbol" name="bill[0][payment_symbol]" placeholder="Payment symbol" value="{{ $num }}">
 
                 </div>
 
@@ -160,7 +158,7 @@
 
                     <!--<label for="account_number">Account number</label>-->
 
-                    <input required type="text" class="form-control" id="account_number" name="bill[0][account_number]" placeholder="Account number">
+                    <input tabindex="6" value="{{ $bill->account_number }}" required type="text" class="form-control" id="account_number" name="bill[0][account_number]" placeholder="Account number">
 
                 </div>
 
@@ -170,7 +168,7 @@
 
                     <!--<label for="swift">SWIFT</label>-->
 
-                    <input type="text" class="form-control" id="swift" name="bill[0][swift]" placeholder="SWIFT">
+                    <input tabindex="8" value="{{ $bill->swift }}" type="text" class="form-control" id="swift" name="bill[0][swift]" placeholder="SWIFT">
 
                 </div>
 
@@ -184,63 +182,83 @@
 
                 <!-- Single Job -->
 
-                <div class="row" data-job-number="0" style="padding-bottom: 10px;">
+                <?php $job_number = 0 ;?>
 
-                    <div class="form-group ">
+                @foreach ( $jobs as $job )
 
-                        <input type="text" id="bill_id" name="jobs[0][bill_id]" hidden value="">
+                    <div class="row" data-job-number="0" style="padding-bottom: 10px;">
 
-                        <!--<label for="quantity">Quantity</label>-->
+                        <input type="hidden" value="{{ $job->id }}" name="jobs[{{ $job_number }}][id]">
 
-                        <div class="col-sm-1">
+                        <div class="form-group ">
 
-                            <input required class="form-control" type="number" id="jobs.quantity" name="jobs[0][quantity]" value="1">
+                            <!--<label for="quantity">Quantity</label>-->
 
-                        </div>
+                            <div class="col-sm-1">
 
-                        <!--<label for="description">Job description</label>-->
+                                <input required class="form-control" type="number" id="jobs.quantity" name="jobs[{{ $job_number }}][quantity]" value="{{ $job->quantity }}">
 
-                        <div class="col-sm-6">
+                            </div>
 
-                            <input required class="form-control" type="text" id="description" name="jobs[0][description]" placeholder="Description">
+                            <!--<label for="description">Job description</label>-->
 
-                        </div>
+                            <div class="col-sm-6">
 
-                        <!--<label for="price">Price</label>-->
+                                <input required class="form-control" type="text" id="description" name="jobs[{{ $job_number }}][description]" placeholder="Description" value="{{ $job->description }}">
 
-                        <div class="col-sm-2">
+                            </div>
 
-                            <input required class="form-control" type="number" id="price" name="jobs[0][price]" placeholder="Price">
+                            <!--<label for="price">Price</label>-->
 
-                        </div>
+                            <div class="col-sm-2">
 
-                        <!--<label for="currency">Currency</label>-->
+                                <input required class="form-control" type="number" id="price" name="jobs[{{ $job_number }}][price]" placeholder="Price" value="{{ $job->price }}">
 
-                        <div class="col-sm-2">
+                            </div>
 
-                            <select class="form-control" id="currency" name="jobs[0][currency]">
+                            <!--<label for="currency">Currency</label>-->
 
-                                <option value="Kč">Kč</option>
+                            <div class="col-sm-2">
 
-                                <option value="EUR">EUR</option>
+                                <select class="form-control" id="currency" name="jobs[{{ $job_number }}][currency]">
 
-                                <option value="CHF">CHF</option>
+                                    <option <?= ( $job->currency == 'CZK' ) ? 'selected' : '' ?> value="Kč">Kč</option>
 
-                            </select>
+                                    <option <?= ( $job->currency == 'EUR' ) ? 'selected' : '' ?>  value="EUR">EUR</option>
 
-                        </div>
+                                    <option <?= ( $job->currency == 'CHF' ) ? 'selected' : '' ?>  value="CHF">CHF</option>
 
-                        <div class="col-sm-1 buttons-col">
+                                </select>
 
-                            <span class="circle-button add" id="more_jobs">+</span>
+                            </div>
+
+                            <div class="col-sm-1 buttons-col">
+
+                                @if ( $job_number == 0 )
+
+                                    <span class="circle-button add" id="more_jobs">+</span>
+
+                                    <span class="circle-button delete" id="delete_job">x</span>
+
+                                @else
+
+                                    <span class="circle-button delete" id="delete_job">x</span>
+
+                                @endif
+
+                            </div>
+
+
+
+                            <?php $job_number++ ;?>
 
                         </div>
 
                     </div>
 
-                </div>
+            @endforeach
 
-                <!--<span class="btn btn-block btn-dollar-green" id="more_jobs">More jobs</span>-->
+            <!--<span class="btn btn-block btn-dollar-green" id="more_jobs">More jobs</span>-->
 
                 <button class="btn btn-block btn-dollar-green" type="submit">Save & Generate PDF</button>
 

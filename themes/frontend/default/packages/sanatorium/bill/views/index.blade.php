@@ -2,6 +2,42 @@
 
 @section('bill')
 
+@section('scripts')
+
+    <script type="text/javascript">
+
+        $(function(){
+
+            $('.paid-button').on('click', function(){
+
+                var billNum = $(this).attr('bill-num');
+
+                var clientName = $(this).attr('client-name');
+
+                var billId = $(this).attr('bill-id');
+
+                $('#paidModalTitle').text('Invoice: ' + billNum + ', ' + clientName);
+
+                $('#modalBillId').val(billId);
+
+                $('.paid-modal').fadeIn('slow');
+
+            });
+
+            $('#closeButton').on('click', function () {
+
+                $('.paid-modal').fadeOut('slow');
+
+            })
+
+        });
+
+    </script>
+
+@stop
+
+@include('sanatorium/bill::partials/paid-modal')
+
     <div class="container">
 
         <table class="bill-list-table" style="width: 100%;">
@@ -17,6 +53,10 @@
             <th>Buyer</th>
 
             <th>Total</th>
+
+            <th>Sent?</th>
+
+            <th>Paid?</th>
 
             <th></th>
 
@@ -65,17 +105,63 @@
 
                         @foreach ( $bill->jobs() as $job )
 
-                                <?php array_push($totalPrice, $job->price); ?>
+                            <?php array_push($totalPrice, $job->price); ?>
 
                         @endforeach
 
-                            {{ array_sum($totalPrice) }} {{ $bill->jobs()->first()->currency  }}
+                        {{ array_sum($totalPrice) }} {{ $bill->jobs()->first()->currency  }}
+
+                    </td>
+
+                    <td>
+
+                        @if ( $bill->sent )
+
+                            <span class="dollar-green">
+
+                            {{ $bill->sent }}
+
+                            </span>
+
+                        @else
+
+                            <span class="danger">
+
+                            Not yet
+
+                            </span>
+
+                        @endif
+
+                    </td>
+
+                    <td>
+
+                        @if ( $bill->paid )
+
+                            <span class="dollar-green">
+
+                            {{ $bill->paid }}
+
+                            </span>
+
+                        @else
+
+                            <span class="danger">
+
+                            Not yet
+
+                            </span>
+
+                        @endif
 
                     </td>
 
                     <td class="download-icons">
 
                         <a href="{{ route('sanatorium.bill.bills.edit', ['id' => $bill->id]) }}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+
+                        <span class="paid-button" bill-id="{{ $bill->id }}" bill-num="{{ $bill->num }}" client-name="{{ $client->name }}"><i class="fa fa-usd" aria-hidden="true"></i></span>
 
                         <a href="{{ route('sanatorium.bill.bills.show', ['id' => $bill->num]) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
 

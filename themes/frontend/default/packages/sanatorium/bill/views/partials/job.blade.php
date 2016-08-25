@@ -26,7 +26,7 @@
 
             '<select class="form-control" id="currency" name="jobs[' + job_number + '][currency]">' +
 
-                '<option value="Kč">Kč</option>' +
+                '<option value="CZK">Kč</option>' +
 
                 '<option value="EUR">EUR</option>' +
 

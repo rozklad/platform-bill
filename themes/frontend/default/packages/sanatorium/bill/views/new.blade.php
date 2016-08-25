@@ -6,35 +6,33 @@
 
     <!-- <div class="row" data-job-number="' + job_number + '"><div class="form-group"><input type="text" id="bill_id" name="jobs[' + job_number + '][bill_id]" hidden value=""><div class="col-sm-1"><input required class="form-control" type="number" id="jobs.quantity" name="jobs[' + job_number + '][quantity]" value="1"></div><div class="col-sm-6"><input required class="form-control" type="text" id="description" name="jobs[' + job_number + '][description]" placeholder="Description"></div><div class="col-sm-2"><input required class="form-control" type="number" id="price" name="jobs[' + job_number + '][price]" placeholder="Price"></div><div class="col-sm-2"><select class="form-control" id="currency" name="jobs[' + job_number + '][currency]"><option value="Kč">Kč</option><option value="EUR">EUR</option><option value="CHF">CHF</option></select></div></div></div> -->
 
-<script>
+    <script>
 
-    $(function () {
+        $(function () {
 
-        var job_number = 1;
+            var job_number = 1;
 
-        $('#more_jobs').click(function () {
+            $('#more_jobs').click(function () {
 
-            //$(".row[data-job-number='" + (job_number - 1) + "']").after();
+                //$(".row[data-job-number='" + (job_number - 1) + "']").after();
 
-            $(".row[data-job-number]").last().after(@include('sanatorium/bill::partials/job'));
+                $(".row[data-job-number]").last().after(@include('sanatorium/bill::partials/job'));
 
-            job_number++;
+                job_number++;
+
+            });
+
+            $(document).on('click', '#delete_job', function() {
+
+                $(this).parent().parent().parent().remove();
+
+                job_number--;
+
+            });
 
         });
 
-        $(document).on('click', '#delete_job', function() {
-
-            $(this).parent().parent().parent().remove();
-
-            job_number--;
-
-        });
-
-
-
-    });
-
-</script>
+    </script>
 
 @stop
 
@@ -58,8 +56,8 @@
 
                     <label for="issue_date">Issue date</label>
 
-                    <input class="form-control" type="date" id="issue_date" name="bill[0][issue_date]"
-                    value="{{ $issue_date }}">
+                    <input tabindex="1" class="form-control" type="date" id="issue_date" name="bill[0][issue_date]"
+                           value="{{ $issue_date }}">
 
                 </div>
 
@@ -69,7 +67,7 @@
 
                     <!--<label for="means_of_payment">Means of payment</label>-->
 
-                    <select class="form-control" name="bill[0][means_of_payment]" id="means_of_payment">
+                    <select tabindex="3" class="form-control" name="bill[0][means_of_payment]" id="means_of_payment">
 
                         <option value="Bank transfer">Bank transfer</option>
 
@@ -87,11 +85,11 @@
 
                     <!--<label for="supplier_id">Supplier</label>-->
 
-                    <select class="form-control" name="bill[0][supplier_id]" id="supplier_id">
+                    <select tabindex="5" class="form-control" name="bill[0][supplier_id]" id="supplier_id">
 
                         @foreach ( $suppliers as $supplier )
 
-                        <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
+                            <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
 
                         @endforeach
 
@@ -105,7 +103,7 @@
 
                     <!--<label for="iban">IBAN</label>-->
 
-                    <input type="text" class="form-control" id="iban" name="bill[0][iban]" placeholder="IBAN">
+                    <input tabindex="7" value="{{ $suppliers->first()->iban }}" type="text" class="form-control" id="iban" name="bill[0][iban]" placeholder="IBAN">
 
                 </div>
 
@@ -115,11 +113,11 @@
 
                     <!--<label for="buyer_id">Buyer</label>-->
 
-                    <select class="form-control" name="bill[0][buyer_id]" id="buyer_id">
+                    <select tabindex="9" class="form-control" name="bill[0][buyer_id]" id="buyer_id">
 
                         @foreach ( $buyers as $buyer )
 
-                        <option value="{{ $buyer->id }}">{{ $buyer->name }}</option>
+                            <option value="{{ $buyer->id }}">{{ $buyer->name }}</option>
 
                         @endforeach
 
@@ -139,8 +137,8 @@
 
                     <label for="due_date">Due date</label>
 
-                    <input class="form-control" type="date" id="due_date" name="bill[0][due_date]"
-                    value="{{ $due_date }}">
+                    <input tabindex="2" class="form-control" type="date" id="due_date" name="bill[0][due_date]"
+                           value="{{ $due_date }}">
 
                 </div>
 
@@ -150,7 +148,7 @@
 
                     <!--<label for="payment_symbol">Payment symbol</label>-->
 
-                    <input required type="text" class="form-control" id="payment_symbol" name="bill[0][payment_symbol]" placeholder="Payment symbol" value="{{ $num }}">
+                    <input tabindex="4" required type="text" class="form-control" id="payment_symbol" name="bill[0][payment_symbol]" placeholder="Payment symbol" value="{{ $num }}">
 
                 </div>
 
@@ -160,7 +158,7 @@
 
                     <!--<label for="account_number">Account number</label>-->
 
-                    <input required type="text" class="form-control" id="account_number" name="bill[0][account_number]" placeholder="Account number">
+                    <input tabindex="6" value="{{ $suppliers->first()->account_number }}" required type="text" class="form-control" id="account_number" name="bill[0][account_number]" placeholder="Account number">
 
                 </div>
 
@@ -170,7 +168,7 @@
 
                     <!--<label for="swift">SWIFT</label>-->
 
-                    <input type="text" class="form-control" id="swift" name="bill[0][swift]" placeholder="SWIFT">
+                    <input tabindex="8" value="{{ $suppliers->first()->swift }}" type="text" class="form-control" id="swift" name="bill[0][swift]" placeholder="SWIFT">
 
                 </div>
 
@@ -188,7 +186,7 @@
 
                     <div class="form-group ">
 
-                        <input type="text" id="bill_id" name="jobs[0][bill_id]" hidden value="">
+                        <input type="text" id="bill_id" name="jobs[0][bill_id]" hidden value="<?= (isset($bill) ? $bill->id : '')?> ">
 
                         <!--<label for="quantity">Quantity</label>-->
 
@@ -220,7 +218,7 @@
 
                             <select class="form-control" id="currency" name="jobs[0][currency]">
 
-                                <option value="Kč">Kč</option>
+                                <option value="CZK">Kč</option>
 
                                 <option value="EUR">EUR</option>
 

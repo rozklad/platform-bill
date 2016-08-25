@@ -1,9 +1,9 @@
 <?php namespace Sanatorium\Bill\Widgets;
 
 use Carbon\Carbon;
-use Platform\Access\Controllers\AdminController;
+use Platform\Foundation\Controllers\Controller;
 
-class Bill extends AdminController {
+class Frontendbill extends Controller {
 
     public function moneyOverTime()
     {
@@ -41,16 +41,15 @@ class Bill extends AdminController {
             $money = 0;
 
             $bills = $repo->where($date_column, '>=', $start->format('Y-m-d'))
-                    ->where($date_column, '<=', $start->format('Y-m-').'31')
-                    ->get();
+                ->where($date_column, '<=', $start->format('Y-m-').'31')
+                ->get();
 
-            $currencies_all = app('sanatorium.pricing.currency')->get();
-
-            foreach ( $currencies_all as $currency_all ) {
-
-                $currencies[strtoupper($currency_all->code)] = $currency_all->unit;
-
-            }
+            // @todo: automatically resolve currencies
+            $currencies = [
+                'Kč' => 1,
+                'EUR' => 27,
+                'CHF' => 25
+            ];
 
             foreach( $bills as $bill ) {
 

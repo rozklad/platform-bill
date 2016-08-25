@@ -10,6 +10,10 @@ body {
     color: var(--dollar-green);
 }
 
+.danger {
+    color: #ff0800;
+}
+
 /*
 * Bill header
 *
@@ -73,10 +77,11 @@ body {
     border-bottom: 2px solid #ddd;
 }
 
-.download-icons a {
+.download-icons a, .download-icons span {
     color: var(--dollar-green);
     padding-right: 10px;
     font-size: 18px;
+    cursor: pointer;
 }
 
 .download-icons a:last-child {
@@ -85,6 +90,34 @@ body {
 
 .buttons-col {
     margin-top: 5px;
+}
+
+.paid-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 2;
+    background: rgba(0,0,0,.7);
+    display: none;
+}
+
+.paid-modal .modal-content {
+    position: absolute;
+    z-index: 3;
+    top: 30%;
+    bottom: 30%;
+    left: 30%;
+    right: 30%;
+}
+
+.paid-modal .modal-content .fa {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    font-size: 22px;
+    cursor: pointer;
 }
 
 /*

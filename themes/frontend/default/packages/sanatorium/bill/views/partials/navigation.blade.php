@@ -35,4 +35,15 @@
         </a>
 
     </li>
+
+    <li class="<?php echo $url == route('sanatorium.bill.bills.statistics') ? 'active' : '' ;?>">
+
+        <a target="_self" href="{{ route('sanatorium.bill.bills.statistics') }}">
+
+            Statistics
+
+        </a>
+
+    </li>
+
 </ul>

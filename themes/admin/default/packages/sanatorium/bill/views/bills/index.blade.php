@@ -43,11 +43,13 @@
 
 		$buyers = [];
 
-		$currencies = [
-				'Kč' => 1,
-				'EUR' => 27,
-				'CHF' => 25
-		];
+		$currencies_all = app('sanatorium.pricing.currency')->get();
+
+		foreach ( $currencies_all as $currency_all ) {
+
+			$currencies[strtoupper($currency_all->code)] = $currency_all->unit;
+
+		}
 
 		foreach( $bills as $bill ) {
 

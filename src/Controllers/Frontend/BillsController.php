@@ -78,7 +78,7 @@ class BillsController extends Controller {
         return $this->processForm('create', $id);
     }
 
-    public function newBill($id = null)
+    public function newBill()
     {
 
         $bills = app('sanatorium.bill.bill');
@@ -91,61 +91,73 @@ class BillsController extends Controller {
 
         $year = date("Y");
 
-        if ( $id ) {
+        $next_bill = count($bills->where('year', $year)->get()) + 1;
 
-            $bill = $bills->find($id);
+        $three_digit = str_pad($next_bill, 3, "0", STR_PAD_LEFT);
 
-            $num = $bill->num;
+        $num = $year . $three_digit;
 
-            $issue_date = date('Y-m-d', strtotime($bill->issue_date));
+        $issue_date = date("Y-m-j");
 
-            $due_date = date('Y-m-d', strtotime($bill->due_date));
+        $due_date = date('Y-m-d', strtotime('+14 days'));
 
-        } else {
+        /*$bill = [
+        "num" => $num,
+        "issue_date" => date("Y-m-j"),
+        "due_date" => date('Y-m-d', strtotime('+14 days')),
+        "means_of_payment" => "",
+        "payment_symbol" => "",
+        "account_number" => "",
+        "iban" => "",
+        "swift" => "",
+        "buyer_id" => "1",
+        "supplier_id" => "1",
+        "year" => $year,
+        ];
 
-            $next_bill = count($bills->where('year', $year)->get()) + 1;
+        list($messages) = $this->bills->store(null, $bill);
 
-            $three_digit = str_pad($next_bill, 3, "0", STR_PAD_LEFT);
+        $actual_bill = $this->bills->get()->last();
 
-            $num = $year . $three_digit;
+        /*$users = app('platform.users')->get();
 
-            $issue_date = date("Y-m-j");
+        $clients = app('sanatorium.clients.client')->get();
 
-            $due_date = date('Y-m-d', strtotime('+14 days'));
+        $year = date("Y");
 
-            /*$bill = [
-            "num" => $num,
-            "issue_date" => date("Y-m-j"),
-            "due_date" => date('Y-m-d', strtotime('+14 days')),
-            "means_of_payment" => "",
-            "payment_symbol" => "",
-            "account_number" => "",
-            "iban" => "",
-            "swift" => "",
-            "buyer_id" => "1",
-            "supplier_id" => "1",
-            "year" => $year,
-            ];
+        $num = count($bills->where('year', $year)->get()) + 1;
 
-            list($messages) = $this->bills->store(null, $bill);
+        return view('sanatorium/bill::new', compact('num', 'users', 'clients'));
 
-            $actual_bill = $this->bills->get()->last();
-
-            /*$users = app('platform.users')->get();
-
-            $clients = app('sanatorium.clients.client')->get();
-
-            $year = date("Y");
-
-            $num = count($bills->where('year', $year)->get()) + 1;
-
-            return view('sanatorium/bill::new', compact('num', 'users', 'clients'));
-
-            return redirect()->route('sanatorium.bill.bills.edit', $actual_bill->id);*/
-
-        }
+        return redirect()->route('sanatorium.bill.bills.edit', $actual_bill->id);*/
 
         return view('sanatorium/bill::new', compact('num', 'issue_date', 'due_date', 'suppliers', 'buyers'));
+
+    }
+
+    public function editBill($id) {
+
+        $bills = app('sanatorium.bill.bill');
+
+        $clients = app('sanatorium.clients.client')->get();
+
+        $suppliers = $clients->where('supplier', 1);
+
+        $buyers = $clients->where('supplier', 0);
+
+        $year = date("Y");
+
+        $bill = $bills->find($id);
+
+        $num = $bill->num;
+
+        $issue_date = date('Y-m-d', strtotime($bill->issue_date));
+
+        $due_date = date('Y-m-d', strtotime($bill->due_date));
+
+        $jobs = app('sanatorium.bill.job')->where('bill_id', $id)->get();
+
+        return view('sanatorium/bill::edit', compact('bill','jobs','num', 'issue_date', 'due_date', 'suppliers', 'buyers'));
 
     }
 
@@ -166,9 +178,19 @@ class BillsController extends Controller {
 
         foreach ( request()->jobs as $job ) {
 
+            if ( isset($job['id']) ) {
+
+                $job_id = $job['id'];
+
+            } else {
+
+                $job_id = null;
+
+            }
+
             $job["bill_id"] = $bill->id;
 
-            list($messages_job) = $this->jobs->store(null, $job);
+            list($messages_job) = $this->jobs->store($job_id, $job);
 
         }
 
@@ -288,7 +310,9 @@ class BillsController extends Controller {
 
     public function send($invoice)
     {
-        $bill = app('sanatorium.bill.bill')->where('num', $invoice)->first();
+        $bills = app('sanatorium.bill.bill');
+
+        $bill = $bills->where('num', $invoice)->first();
 
         $object = request()->all();
 
@@ -296,7 +320,15 @@ class BillsController extends Controller {
 
         $attachments[] = $file_path;
 
+        $date = [
+          'sent' => date('d-m-Y')
+        ];
+
+        list($messages_bill, $bill) = $bills->store($bill->id, $date);
+
         Event::fire('invoice', [ $object, $attachments ]);
+
+        return redirect()->route('sanatorium.bill.bills.index');
     }
 
     public function show($invoice)
@@ -311,6 +343,33 @@ class BillsController extends Controller {
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="'.$filename.'"'
         ]);
+    }
+
+    public function paid()
+    {
+        $bills = app('sanatorium.bill.bill');
+
+        $bill_id = request()->all()['id'];
+
+        list($messages_bill, $bill) = $bills->store($bill_id, request()->only('paid'));
+
+        return redirect()->route('sanatorium.bill.bills.index');
+
+    }
+
+    public function statistics()
+    {
+        $bills = app('sanatorium.bill.bill')->get();
+
+        $currencies_all = app('sanatorium.pricing.currency')->get();
+
+        foreach ( $currencies_all as $currency_all ) {
+
+            $currencies[strtoupper($currency_all->code)] = $currency_all->unit;
+
+        }
+
+        return view('sanatorium/bill::statistics', compact('bills', 'currencies'));
     }
 
 }

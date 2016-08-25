@@ -67,7 +67,7 @@ return [
 	|
 	*/
 
-	'version' => '1.0.1',
+	'version' => '1.0.2',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -180,14 +180,16 @@ return [
 		], function()
 		{
 			Route::get('/', ['as' => 'sanatorium.bill.bills.index', 'uses' => 'BillsController@index']);
+            Route::post('/', ['as' => 'sanatorium.bill.bills.paid', 'uses' => 'BillsController@paid']);
 			Route::post('create', ['as' => 'sanatorium.bill.bills.create', 'uses' => 'BillsController@create']);
 			Route::get('create', ['as' => 'sanatorium.bill.bills.create', 'uses' => 'BillsController@newBill']);
-			Route::get('{id}'   , ['as' => 'sanatorium.bill.bills.edit'  , 'uses' => 'BillsController@newBill']);
-			Route::post('{id}'  , ['as' => 'sanatorium.bill.bills.edit'  , 'uses' => 'BillsController@update']);
+			Route::get('edit/{id}'   , ['as' => 'sanatorium.bill.bills.edit'  , 'uses' => 'BillsController@editBill']);
+			Route::post('edit/{id}'  , ['as' => 'sanatorium.bill.bills.edit'  , 'uses' => 'BillsController@update']);
             Route::get('download/{filename}', ['as' => 'sanatorium.bill.bills.download' , 'uses' => 'BillsController@download']);
             Route::get('send/{invoice}', ['as' => 'sanatorium.bill.bills.send', 'uses' => 'BillsController@sendForm']);
             Route::post('send/{invoice}', ['as' => 'sanatorium.bill.bills.send', 'uses' => 'BillsController@send']);
             Route::get('show/{invoice}', ['as' => 'sanatorium.bill.bills.show', 'uses' => 'BillsController@show']);
+            Route::get('statistics', ['as' =>'sanatorium.bill.bills.statistics', 'uses' => 'BillsController@statistics']);
 		});
 
 					Route::group([
