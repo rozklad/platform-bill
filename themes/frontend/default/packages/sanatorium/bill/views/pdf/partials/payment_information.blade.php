@@ -5,7 +5,7 @@
             {{ trans('sanatorium/bill::bills/pdf.template.issue_date') }}
         </td>
         <td style="text-align:right;">
-            {{ $bill->issue_date }}
+            {{ $bill->issue_date->format('Y-m-d') }}
         </td>
     </tr>
     <tr>
@@ -13,7 +13,7 @@
             {{ trans('sanatorium/bill::bills/pdf.template.due_date') }}
         </td>
         <td style="text-align:right;">
-            {{ $bill->due_date }}
+            {{ $bill->due_date->format('Y-m-d') }}
         </td>
     </tr>
     <tr>
