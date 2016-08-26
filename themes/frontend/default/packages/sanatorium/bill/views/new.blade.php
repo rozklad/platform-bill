@@ -186,7 +186,7 @@
 
                     <div class="form-group ">
 
-                        <input type="text" id="bill_id" name="jobs[0][bill_id]" hidden value="<?= (isset($bill) ? $bill->id : '')?> ">
+                        <input type="text" id="bill_id" name="jobs[0][bill_id]" hidden value="">
 
                         <!--<label for="quantity">Quantity</label>-->
 
