@@ -89,7 +89,11 @@
 
                         @foreach ( $suppliers as $supplier )
 
-                            <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
+                            @if ( is_object( $supplier ) )
+
+                                <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
+
+                            @endif
 
                         @endforeach
 
@@ -103,7 +107,17 @@
 
                     <!--<label for="iban">IBAN</label>-->
 
-                    <input tabindex="7" value="{{ $suppliers->first()->iban }}" type="text" class="form-control" id="iban" name="bill[0][iban]" placeholder="IBAN">
+                    <?php
+
+                    $actual_supplier = $suppliers->first();
+
+                    ?>
+
+                    @if ( is_object( $actual_supplier ) )
+
+                    <input tabindex="7" value="{{ $actual_supplier->iban }}" type="text" class="form-control" id="iban" name="bill[0][iban]" placeholder="IBAN">
+
+                    @endif
 
                 </div>
 
@@ -158,7 +172,11 @@
 
                     <!--<label for="account_number">Account number</label>-->
 
-                    <input tabindex="6" value="{{ $suppliers->first()->account_number }}" required type="text" class="form-control" id="account_number" name="bill[0][account_number]" placeholder="Account number">
+                    @if ( is_object( $actual_supplier ) )
+
+                        <input tabindex="6" value="{{ $actual_supplier->account_number }}" required type="text" class="form-control" id="account_number" name="bill[0][account_number]" placeholder="Account number">
+
+                    @endif
 
                 </div>
 
@@ -168,7 +186,11 @@
 
                     <!--<label for="swift">SWIFT</label>-->
 
-                    <input tabindex="8" value="{{ $suppliers->first()->swift }}" type="text" class="form-control" id="swift" name="bill[0][swift]" placeholder="SWIFT">
+                    @if ( is_object( $actual_supplier ) )
+
+                        <input tabindex="8" value="{{ $actual_supplier->swift }}" type="text" class="form-control" id="swift" name="bill[0][swift]" placeholder="SWIFT">
+
+                    @endif
 
                 </div>
 
