@@ -19,7 +19,7 @@
 	<script type="text/javascript">
 		$(function(){
 
-			var jobs = {!! json_encode($bill->jobs()) !!};
+			var jobs = {!! json_encode($bill->jobs) !!};
 
 			function loadJobsTemplate() {
 

@@ -103,7 +103,7 @@
 
                         <?php $totalPrice = []; ?>
 
-                        @foreach ( $bill->jobs() as $job )
+                        @foreach ( $bill->jobs as $job )
 
                             <?php array_push($totalPrice, $job->price); ?>
 

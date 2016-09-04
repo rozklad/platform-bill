@@ -25,6 +25,7 @@ class Bill extends Model implements EntityInterface {
 	 */
 	protected $with = [
 		'values.attribute',
+        'jobs',
 	];
 
 	/**
@@ -41,7 +42,7 @@ class Bill extends Model implements EntityInterface {
 
     public function jobs()
     {
-        return $this->hasMany('Sanatorium\Bill\Models\Job')->get();
+        return $this->hasMany('Sanatorium\Bill\Models\Job');
     }
 
 }

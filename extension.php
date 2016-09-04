@@ -67,7 +67,7 @@ return [
 	|
 	*/
 
-	'version' => '3.0.6',
+	'version' => '3.0.7',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -190,6 +190,7 @@ return [
             Route::post('send/{invoice}', ['as' => 'sanatorium.bill.bills.send', 'uses' => 'BillsController@send']);
             Route::get('show/{invoice}', ['as' => 'sanatorium.bill.bills.show', 'uses' => 'BillsController@show']);
             Route::get('statistics', ['as' =>'sanatorium.bill.bills.statistics', 'uses' => 'BillsController@statistics']);
+            Route::get('revenue', ['as' =>'sanatorium.bill.bills.revenue', 'uses' => 'BillsController@revenue']);
 		});
 
 					Route::group([

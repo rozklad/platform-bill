@@ -309,7 +309,7 @@ class BillsController extends AdminController {
                     $current_jobs[] = $job_to_sync->id;
                 }
 
-                $old_jobs = $bill->jobs()->lists('id')->toArray();
+                $old_jobs = $bill->jobs->lists('id')->toArray();
 
                 $jobs_to_delete = array_diff($old_jobs, $current_jobs);
 

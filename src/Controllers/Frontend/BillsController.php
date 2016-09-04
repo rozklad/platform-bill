@@ -372,4 +372,44 @@ class BillsController extends Controller {
         return view('sanatorium/bill::statistics', compact('bills', 'currencies'));
     }
 
+
+    public function revenue()
+    {
+        $year = request()->get('year');
+
+        $bills = app('sanatorium.bill.bill');
+
+        $total = 0;
+
+        $currencies = [];
+
+        $currencies_all = app('sanatorium.pricing.currency')->get();
+
+        foreach ( $currencies_all as $currency_all ) {
+
+            $currencies[strtoupper($currency_all->code)] = $currency_all->unit;
+
+        }
+
+        foreach( $bills->where('year', $year)->get() as $bill )
+        {
+
+            foreach( $bill->jobs as $job )
+            {
+
+                $price = $job->price;
+                $currency = $job->currency;
+
+                $money = $job->price * $currencies[ $job->currency ];
+
+                $total = $total + $money;
+
+            }
+
+        }
+
+        return $total;
+
+    }
+
 }
