@@ -2,10 +2,10 @@
     <thead>
     <tr>
         <th>
-            {{ trans('sanatorium/bill::bills/pdf.template.description') }}
+            {{ trans('sanatorium/bill::bills/pdf.template.description', [] , 'messages' , $lang ) }}
         </th>
         <th style="text-align:right">
-            {{ trans('sanatorium/bill::bills/pdf.template.total') }}
+            {{ trans('sanatorium/bill::bills/pdf.template.total' , [] , 'messages' , $lang) }}
         </th>
     </tr>
     </thead>
@@ -17,7 +17,7 @@
                     <strong>{{ $item->description }}</strong><br>
 
 
-                {{ trans('sanatorium/bill::bills/pdf.template.quantity') }}: {{ $item->quantity }}
+                {{ trans('sanatorium/bill::bills/pdf.template.quantity' , [] , 'messages' , $lang) }}: {{ $item->quantity }}
 
             </td>
             <td style="text-align:right">

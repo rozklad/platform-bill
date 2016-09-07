@@ -17,6 +17,13 @@ class CreateBillAttributesTable extends Migration {
             'type' => 'input',
             'description' => 'When was bill paid?',
             'slug' => 'paid',
+        ],
+        [
+            'name' => 'Language',
+            'type' => 'select',
+            'description' => 'Language of client',
+            'slug' => 'lang',
+            'options' => '{"en":"English","cs":"Czech"}',
         ]
     ];
 

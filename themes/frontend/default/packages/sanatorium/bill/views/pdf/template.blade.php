@@ -77,7 +77,7 @@
         <td width="5%">
         </td>
         <td width="60%">
-            <h2>Invoice {{ $bill->payment_symbol }}</h2>
+            <h2>{{ trans('sanatorium/bill::bills/pdf.template.invoice', [], 'messages', $lang) }} {{ $bill->payment_symbol }}</h2>
             @include('sanatorium/bill::pdf/partials/buyer')
         </td>
         <td width="30%">

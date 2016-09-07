@@ -115,7 +115,7 @@
 
                     @if ( is_object( $actual_supplier ) )
 
-                    <input tabindex="7" value="{{ $actual_supplier->iban }}" type="text" class="form-control" id="iban" name="bill[0][iban]" placeholder="IBAN">
+                        <input tabindex="7" value="{{ $actual_supplier->iban }}" type="text" class="form-control" id="iban" name="bill[0][iban]" placeholder="IBAN">
 
                     @endif
 
@@ -131,7 +131,7 @@
 
                         @foreach ( $buyers as $buyer )
 
-                            <option value="{{ $buyer->id }}">{{ $buyer->name }}</option>
+                            <option value="{{ $buyer->id }}" lang="{{ $buyer->lang }}">{{ $buyer->name }}</option>
 
                         @endforeach
 

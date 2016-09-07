@@ -1,4 +1,4 @@
-<h2>Buyer</h2>
+<h2>{{ trans('sanatorium/bill::bills/pdf.template.buyer' , [] , 'messages' , $lang)  }}</h2>
 <strong>{{ $buyer->name }}</strong><br>
 {!! nl2br( $buyer->client_address ) !!}<br>
 <br>

@@ -42,7 +42,7 @@
 
                 <label for="">Text</label>
 
-                <input class="form-control" type="textfield" name="text" required>
+                <textarea class="form-control" rows="10" cols="50" name="text" required></textarea>
 
             </div>
 

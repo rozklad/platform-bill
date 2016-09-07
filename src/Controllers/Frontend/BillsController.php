@@ -8,6 +8,7 @@ use PDF;
 use File;
 use Event;
 use Response;
+use Sanatorium\Localization\Controllers\Frontend\LanguagesController;
 
 
 class BillsController extends Controller {
@@ -97,7 +98,9 @@ class BillsController extends Controller {
 
         $num = $year . $three_digit;
 
-        $issue_date = date("Y-m-j");
+        $issue_date = date("Y-m-d");
+
+        //dd(app('sanatorium.localization.language')->getActiveLanguageLocale());
 
         $due_date = date('Y-m-d', strtotime('+14 days'));
 
@@ -205,9 +208,9 @@ class BillsController extends Controller {
 
             $supplier = app('sanatorium.clients.client')->where('id', $bill->supplier_id)->first();
 
-            $pdf = PDF::loadView('sanatorium/bill::pdf/template', compact('bill', 'jobs', 'buyer', 'supplier'));
+            $lang = $buyer->lang;
 
-            //$pdf = PDF::loadHtml('<h1>Ahoj</h1>');
+            $pdf = PDF::loadView('sanatorium/bill::pdf/template', compact('bill', 'jobs', 'buyer', 'supplier', 'lang'));
 
             $path = storage_path() . "/bills" . "/" . $bill->year;
 
@@ -315,6 +318,8 @@ class BillsController extends Controller {
         $bill = $bills->where('num', $invoice)->first();
 
         $object = request()->all();
+
+        $object['text'] = nl2br($object['text']);
 
         $file_path = storage_path() . '/bills/' . $bill->year . '/' . $bill->num . '.pdf';
 

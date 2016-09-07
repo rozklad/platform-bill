@@ -2,31 +2,71 @@
     <tbody>
     <tr>
         <td>
-            {{ trans('sanatorium/bill::bills/pdf.template.issue_date') }}
+            {{ trans('sanatorium/bill::bills/pdf.template.issue_date' , [] , 'messages' , $lang) }}
         </td>
         <td style="text-align:right;">
-            {{ $bill->issue_date->format('Y-m-d') }}
+
+            @if ( $lang == 'cs' )
+
+                {{ $bill->issue_date->format('d. m. Y') }}
+
+            @else
+
+                {{ $bill->issue_date->format('Y-m-d') }}
+
+            @endif
+
         </td>
     </tr>
     <tr>
         <td>
-            {{ trans('sanatorium/bill::bills/pdf.template.due_date') }}
+            {{ trans('sanatorium/bill::bills/pdf.template.due_date' , [] , 'messages' , $lang) }}
         </td>
         <td style="text-align:right;">
-            {{ $bill->due_date->format('Y-m-d') }}
+
+            @if ( $lang == 'cs' )
+
+                {{ $bill->due_date->format('d. m. Y') }}
+
+            @else
+
+                {{ $bill->due_date->format('Y-m-d') }}
+
+            @endif
+
         </td>
     </tr>
     <tr>
         <td>
-            {{ trans('sanatorium/bill::bills/pdf.template.means_of_payment') }}
+            {{ trans('sanatorium/bill::bills/pdf.template.means_of_payment' , [] , 'messages' , $lang) }}
         </td>
         <td style="text-align:right;">
-            {{ $bill->means_of_payment }}
+
+        <!-- @TODO Better translation of means of payment -->
+
+            @if ( $lang == 'cs' )
+
+                @if ( $bill->means_of_payment == 'Bank transfer' )
+
+                    Převodem na účet
+
+                @elseif ( $bill->means_of_payment == 'Cash' )
+
+                    V hotovsti
+
+                @endif
+
+            @else
+
+                {{ $bill->means_of_payment }}
+
+            @endif
+
         </td>
     </tr>
     <tr>
         <td>
-            {{ trans('sanatorium/bill::bills/pdf.template.payment_symbol') }}
+            {{ trans('sanatorium/bill::bills/pdf.template.payment_symbol' , [] , 'messages' , $lang) }}
         </td>
         <td style="text-align:right;">
             {{ $bill->payment_symbol }}
@@ -34,7 +74,7 @@
     </tr>
     <tr>
         <td>
-            {{ trans('sanatorium/bill::bills/pdf.template.account_number') }}
+            {{ trans('sanatorium/bill::bills/pdf.template.account_number' , [] , 'messages' , $lang) }}
         </td>
         <td style="text-align:right;">
             {{ $bill->account_number }}
@@ -42,7 +82,7 @@
     </tr>
     <tr>
         <td>
-            {{ trans('sanatorium/bill::bills/pdf.template.iban') }}
+            {{ trans('sanatorium/bill::bills/pdf.template.iban' , [] , 'messages' , $lang) }}
         </td>
         <td style="text-align:right;">
             {{ $bill->iban }}
@@ -50,7 +90,7 @@
     </tr>
     <tr>
         <td>
-            {{ trans('sanatorium/bill::bills/pdf.template.swift') }}
+            {{ trans('sanatorium/bill::bills/pdf.template.swift' , [] , 'messages' , $lang) }}
         </td>
         <td style="text-align:right;">
             {{ $bill->swift }}
