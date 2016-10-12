@@ -279,7 +279,7 @@ class BillsController extends Controller {
         $path = storage_path() . '/bills/' . $bill->year . '/' . $invoice . '.pdf';
 
         if ( !file_exists($path) )
-            $this->generateInvoice($invoice, $path);
+            $this->generateInvoice($invoice);
 
         return response()->download($path);
 
@@ -331,7 +331,7 @@ class BillsController extends Controller {
         $path = storage_path() . '/bills/' . $bill->year . '/' . $filename;
 
         if ( !file_exists($path) )
-            $this->generateInvoice($invoice, $path);
+            $this->generateInvoice($invoice);
 
         return Response::make(file_get_contents($path), 200, [
             'Content-Type' => 'application/pdf',
@@ -344,7 +344,7 @@ class BillsController extends Controller {
      * @param null $path
      * @return mixed
      */
-    public function generateInvoice($invoice, $path = null)
+    public function generateInvoice($invoice)
     {
         $bill = app('sanatorium.bill.bill')->where('num', $invoice)->first();
 
@@ -358,8 +358,7 @@ class BillsController extends Controller {
 
         $pdf = PDF::loadView('sanatorium/bill::pdf/template', compact('bill', 'jobs', 'buyer', 'supplier', 'lang'));
 
-        if ( is_null($path) )
-            $path = storage_path() . "/bills" . "/" . $bill->year;
+        $path = storage_path() . "/bills" . "/" . $bill->year;
 
         if ( ! file_exists($path) ) {
 
