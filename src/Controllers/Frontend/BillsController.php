@@ -202,27 +202,7 @@ class BillsController extends Controller {
         {
             $this->alerts->success(trans("sanatorium/bill::bills/message.success.{$mode}"));
 
-            $jobs = app('sanatorium.bill.job')->where('bill_id', $bill->id)->get();
-
-            $buyer = app('sanatorium.clients.client')->where('id', $bill->buyer_id)->first();
-
-            $supplier = app('sanatorium.clients.client')->where('id', $bill->supplier_id)->first();
-
-            $lang = $buyer->lang;
-
-            $pdf = PDF::loadView('sanatorium/bill::pdf/template', compact('bill', 'jobs', 'buyer', 'supplier', 'lang'));
-
-            $path = storage_path() . "/bills" . "/" . $bill->year;
-
-            if ( ! file_exists($path) ) {
-
-                File::makeDirectory($path, 0775, true);
-
-            }
-
-            $file_path = $path . '/' . $bill->num . '.pdf';
-
-            $pdf->save($file_path);
+            $this->generateInvoice($bill->num);
 
             return redirect()->route('sanatorium.bill.bills.index');
         }
@@ -292,13 +272,16 @@ class BillsController extends Controller {
         return view('sanatorium/bill::create', compact('mode', 'bill', 'users', 'clients'));
     }
 
-    public function download($filename)
+    public function download($invoice)
     {
-        $bill = app('sanatorium.bill.bill')->where('num', $filename)->first();
+        $bill = app('sanatorium.bill.bill')->where('num', $invoice)->first();
 
-        $file = storage_path() . '/bills/' . $bill->year . '/' . $filename . '.pdf';
+        $path = storage_path() . '/bills/' . $bill->year . '/' . $invoice . '.pdf';
 
-        return response()->download($file);
+        if ( !file_exists($path) )
+            $this->generateInvoice($invoice, $path);
+
+        return response()->download($path);
 
     }
 
@@ -323,6 +306,9 @@ class BillsController extends Controller {
 
         $file_path = storage_path() . '/bills/' . $bill->year . '/' . $bill->num . '.pdf';
 
+        if ( !file_exists($file_path) )
+            $this->generateInvoice($invoice, $file_path);
+
         $attachments[] = $file_path;
 
         $date = [
@@ -344,10 +330,47 @@ class BillsController extends Controller {
 
         $path = storage_path() . '/bills/' . $bill->year . '/' . $filename;
 
+        if ( !file_exists($path) )
+            $this->generateInvoice($invoice, $path);
+
         return Response::make(file_get_contents($path), 200, [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="'.$filename.'"'
         ]);
+    }
+
+    /**
+     * @param      $invoice Invoice number (f.e. 2016005)
+     * @param null $path
+     * @return mixed
+     */
+    public function generateInvoice($invoice, $path = null)
+    {
+        $bill = app('sanatorium.bill.bill')->where('num', $invoice)->first();
+
+        $jobs = app('sanatorium.bill.job')->where('bill_id', $bill->id)->get();
+
+        $buyer = app('sanatorium.clients.client')->where('id', $bill->buyer_id)->first();
+
+        $supplier = app('sanatorium.clients.client')->where('id', $bill->supplier_id)->first();
+
+        $lang = $buyer->lang;
+
+        $pdf = PDF::loadView('sanatorium/bill::pdf/template', compact('bill', 'jobs', 'buyer', 'supplier', 'lang'));
+
+        if ( is_null($path) )
+            $path = storage_path() . "/bills" . "/" . $bill->year;
+
+        if ( ! file_exists($path) ) {
+
+            File::makeDirectory($path, 0775, true);
+
+        }
+
+        $file_path = $path . '/' . $bill->num . '.pdf';
+
+        return $pdf->save($file_path);
+
     }
 
     public function paid()
