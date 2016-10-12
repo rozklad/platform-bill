@@ -368,7 +368,7 @@ class BillsController extends Controller {
 
         $file_path = $path . '/' . $bill->num . '.pdf';
 
-        return $pdf->save($file_path);
+        $pdf->save($file_path);
 
     }
 
